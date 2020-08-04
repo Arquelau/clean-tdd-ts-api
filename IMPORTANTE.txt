@@ -1,0 +1,5 @@
+PARA ADICIONAR A BIBLIOTECA DE STANDARD-WITH-TYPESCRIPT É NECESSARIO SEGUIR OS COMANDOS:
+
+npm i @typescript-eslint/eslint-plugin@2.33.0
+npm i eslint-config-standard-with-typescript@16.0.0
+npm install --save-dev eslint@6 eslint-plugin-standard@4 eslint-plugin-promise@4 eslint-plugin-import@2 eslint-plugin-node@11
