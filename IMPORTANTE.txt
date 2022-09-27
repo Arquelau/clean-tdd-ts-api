@@ -7,3 +7,7 @@ npm install --save-dev eslint@6 eslint-plugin-standard@4 eslint-plugin-promise@4
 
 git add .
 git commit --amend --no-edit (--amend junta com o commit anterior e --no-edit nao edita o comentario anterior)
+
+git stash -> guarda todos os arquivos pra q eles sejam commitados no seu devido momento
+git stash push <endereço> guarda um arquivo especifico para ser comitado em outro momento
+git stash pop -> arquivo voltaS
