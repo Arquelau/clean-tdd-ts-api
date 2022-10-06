@@ -2,7 +2,7 @@ import { HttpResponse, HttpRequest, Controller, EmailValidator, AddAccount } fro
 import { MissingParamError, InvalidParamError } from '../../errors'
 import { badRequest, ok, serverError } from '../../helper/http-helper'
 
-export class SingUpController implements Controller {
+export class SignUpController implements Controller {
   private readonly emailValidator: EmailValidator
   private readonly addAccount: AddAccount
 
