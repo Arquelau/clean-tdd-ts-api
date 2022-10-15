@@ -1,6 +1,6 @@
 import { HttpResponse, HttpRequest, Controller, AddAccount, Validation } from './signup-controller-protocols'
 import { badRequest, ok, serverError } from '../../helper/http/http-helper'
-import { AccountAlreadyExistsError } from '../../errors'
+import { AccountAlreadyExistsError } from '../../errors/account-already-exists-error'
 
 export class SignUpController implements Controller {
   constructor (
