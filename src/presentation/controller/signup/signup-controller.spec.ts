@@ -9,6 +9,10 @@ const makeAddAccount = (): AddAccount => {
       const fakeAccount = makeFakeAccount()
       return new Promise(resolve => resolve(fakeAccount))
     }
+
+    async exists (account: AddAccountModel): Promise<boolean> {
+      return new Promise(resolve => resolve(false))
+    }
   }
   return new AddAccountStub()
 }

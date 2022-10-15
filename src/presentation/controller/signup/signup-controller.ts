@@ -1,5 +1,6 @@
 import { HttpResponse, HttpRequest, Controller, AddAccount, Validation } from './signup-controller-protocols'
 import { badRequest, ok, serverError } from '../../helper/http/http-helper'
+import { AccountAlreadyExistsError } from '../../errors'
 
 export class SignUpController implements Controller {
   constructor (
@@ -13,6 +14,14 @@ export class SignUpController implements Controller {
         return badRequest(error)
       }
       const { name, email, password } = httpRequest.body
+      const emailExists = await this.addAccount.exists({
+        name,
+        email,
+        password
+      })
+      if (emailExists) {
+        return badRequest(new AccountAlreadyExistsError())
+      }
       const account = await this.addAccount.add({
         name,
         email,

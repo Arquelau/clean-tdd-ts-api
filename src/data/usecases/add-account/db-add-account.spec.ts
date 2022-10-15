@@ -1,5 +1,6 @@
 import { AccountModel, AddAccountModel, AddAccountRepository, Hasher } from './db-add-account-protocols'
 import { DbAddAccount } from './db-add-account'
+import { LoadAccountByEmailRepository } from '../authentication/db-authentication-protocols'
 
 interface SutTypes {
   sut: DbAddAccount
@@ -39,10 +40,21 @@ const makeAddAccountRepositoryStub = (): AddAccountRepository => {
   return new AddAccountRepositoryStub()
 }
 
+const makeLoadAccountByEmailRepositoryStub = (): LoadAccountByEmailRepository => {
+  class LoadAccountByEmailRepositoryStub implements LoadAccountByEmailRepository {
+    async loadByEmail (email: string): Promise<AccountModel> {
+      const fakeAccount = makeFakeAccount()
+      return new Promise(resolve => resolve(fakeAccount))
+    }
+  }
+  return new LoadAccountByEmailRepositoryStub()
+}
+
 const makeSut = (): SutTypes => {
   const hasherStub = makeHasher()
   const addAccountRepositoryStub = makeAddAccountRepositoryStub()
-  const sut = new DbAddAccount(hasherStub, addAccountRepositoryStub)
+  const loadAccountByEmailRepository = makeLoadAccountByEmailRepositoryStub()
+  const sut = new DbAddAccount(hasherStub, addAccountRepositoryStub, loadAccountByEmailRepository)
   return {
     sut,
     hasherStub,
