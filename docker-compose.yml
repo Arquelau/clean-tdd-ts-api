@@ -5,7 +5,7 @@ services:
     image: mongo:4.1
     restart: always
     volumes:
-      - ./data:/data/db
+      - mongodbdata:/data/db
     ports:
       - "27017:27017"
   api:
@@ -20,3 +20,6 @@ services:
       - "5050:5050"
     links:
       - mongo
+volumes:
+  mongodbdata:
+    driver: local
