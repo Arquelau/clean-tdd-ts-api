@@ -7,6 +7,5 @@ export interface AddAccountModel {
 }
 
 export interface AddAccount {
-  add: (account: AddAccountModel) => Promise<AccountModel>
-  exists: (account: AddAccountModel) => Promise<boolean>
+  add: (account: AddAccountModel) => Promise<AccountModel | null>
 }

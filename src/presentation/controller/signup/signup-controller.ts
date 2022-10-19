@@ -1,11 +1,12 @@
-import { HttpResponse, HttpRequest, Controller, AddAccount, Validation } from './signup-controller-protocols'
-import { badRequest, ok, serverError } from '../../helper/http/http-helper'
-import { AccountAlreadyExistsError } from '../../errors/account-already-exists-error'
+import { HttpResponse, HttpRequest, Controller, AddAccount, Validation, Authentication } from './signup-controller-protocols'
+import { badRequest, forbidden, ok, serverError, unauthorized } from '../../helper/http/http-helper'
+import { EmailInUseError } from '../../errors/email-in-use-error'
 
 export class SignUpController implements Controller {
   constructor (
     private readonly addAccount: AddAccount,
-    private readonly validation: Validation) {}
+    private readonly validation: Validation,
+    private readonly authentication: Authentication) {}
 
   async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
     try {
@@ -14,20 +15,19 @@ export class SignUpController implements Controller {
         return badRequest(error)
       }
       const { name, email, password } = httpRequest.body
-      const emailExists = await this.addAccount.exists({
-        name,
-        email,
-        password
-      })
-      if (emailExists) {
-        return badRequest(new AccountAlreadyExistsError())
-      }
       const account = await this.addAccount.add({
         name,
         email,
         password
       })
-      return ok(account)
+      if (!account) {
+        return forbidden(new EmailInUseError())
+      }
+      const accessToken = await this.authentication.auth({ email, password })
+      if (!accessToken) {
+        return unauthorized()
+      }
+      return ok({ accessToken })
     } catch (error) {
       return serverError(error)
     }
