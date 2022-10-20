@@ -4,9 +4,16 @@ import { AccountMongoRepository } from './account-mongo-repository'
 
 let accountCollection: Collection
 
+const makeFakeAccount = (): any => ({
+  name: 'any_name',
+  email: 'any_email@mail.com',
+  password: 'any_password'
+})
+
 describe('Account Mongo Repository', () => {
   beforeAll(async () => {
-    await MongoHelper.connect(process.env.MONGO_URL)
+    const mongoUrl = process.env.MONGO_URL || ''
+    await MongoHelper.connect(mongoUrl)
   })
 
   afterAll(async () => {
@@ -37,11 +44,7 @@ describe('Account Mongo Repository', () => {
 
   test('Should return an account on loadByEmail success', async () => {
     const sut = makeSut()
-    await accountCollection.insertOne({
-      name: 'any_name',
-      email: 'any_email@mail.com',
-      password: 'any_password'
-    })
+    await accountCollection.insertOne(makeFakeAccount())
     const account = await sut.loadByEmail('any_email@mail.com')
     expect(account).toBeTruthy()
     expect(account.id).toBeTruthy()
@@ -58,17 +61,17 @@ describe('Account Mongo Repository', () => {
 
   test('Should update the account accesToken on updateAccessToken success', async () => {
     const sut = makeSut()
-    const res = await accountCollection.insertOne({
-      name: 'any_name',
-      email: 'any_email@mail.com',
-      password: 'any_password'
-    })
+    const res = await accountCollection.insertOne(makeFakeAccount())
     const id = res.insertedId
     const accountBefore = await accountCollection.findOne(id)
-    expect(accountBefore.accessToken).toBeFalsy()
+    if (accountBefore) {
+      expect(accountBefore.accessToken).toBeFalsy()
+    }
     await sut.updateAccessToken(id.toString(), 'any_token')
     const accountAfter = await accountCollection.findOne(id)
-    expect(accountAfter).toBeTruthy()
-    expect(accountAfter.accessToken).toBe('any_token')
+    if (accountAfter) {
+      expect(accountAfter).toBeTruthy()
+      expect(accountAfter.accessToken).toBe('any_token')
+    }
   })
 })

@@ -1,10 +1,10 @@
 export interface SurveyAnswers {
-  image: 'any_image'
-  answer: 'any_answer'
+  image?: string
+  answer: string
 }
 
 export interface AddSurveyModel {
-  question: 'any_question'
+  question: string
   answers: SurveyAnswers[]
 }
 
