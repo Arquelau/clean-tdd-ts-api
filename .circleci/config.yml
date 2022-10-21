@@ -12,6 +12,9 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
+          name: Build App
+          command: npm run build
+      - run:
           name: Codecov Coverage 
           command: | 
             eslint 'src/**'
