@@ -1,11 +1,10 @@
 version: 2.1
 
 jobs:
-  node/test:
-    version: '18.7'
-    pkg-manager: npm
-
   steps:
+    - node/test:
+        version: '18.7'
+        pkg-manager: npm
     - run:
         name: Codecov Coverage 
         command: | 
