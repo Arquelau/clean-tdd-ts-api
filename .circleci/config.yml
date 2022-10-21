@@ -16,4 +16,7 @@ jobs:
           command: | 
             eslint 'src/**'
             npm run test:codecov
-
+workflows:
+  test_my_api:
+    jobs:
+      - coverage_test
