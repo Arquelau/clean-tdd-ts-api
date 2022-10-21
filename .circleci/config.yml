@@ -1,13 +1,19 @@
 version: 2.1
+orbs:
+  node: circleci/node@5.0.3
 
 jobs:
-  steps:
-    - node/test:
-        version: '18.7'
-        pkg-manager: npm
-    - run:
-        name: Codecov Coverage 
-        command: | 
-          eslint 'src/**'
-          npm run test:codecov
+  coverage_test:
+    executor: 
+      name: node/default
+      tag: 18
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Codecov Coverage 
+          command: | 
+            eslint 'src/**'
+            npm run test:codecov
 
