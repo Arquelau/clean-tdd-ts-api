@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   coverage_test:
     docker: 
-      - image: circleci/node@5.0.3
+      - image: circleci/node:17
     steps:
       - checkout
       - run:
