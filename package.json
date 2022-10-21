@@ -14,7 +14,8 @@
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage"
+    "test:ci": "npm test -- --coverage",
+    "test:codecov": "npm run test:ci && codecov"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "@types/supertest": "^2.0.12",
     "@types/validator": "^13.7.7",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "codecov": "^3.8.3",
     "eslint": "^8.24.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-import": "^2.26.0",

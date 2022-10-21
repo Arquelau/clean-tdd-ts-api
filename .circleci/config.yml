@@ -1,0 +1,16 @@
+version: 2.1
+
+workflows:
+  clean-node-ts-api-coverage: 
+    jobs:
+      - node/test:
+          version: '18.7'
+          pkg-manager: npm
+
+      steps:
+        - run:
+            name: Codecov Coverage 
+            command: | 
+              eslint 'src/**'
+              npm run test:codecov
+
