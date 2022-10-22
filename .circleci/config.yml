@@ -12,7 +12,7 @@ jobs:
           name: Install npm dependencies
           command: |
             npm install
-            npm uninstall @types/mongo
+            npm uninstall @types/mongodb
       - run:
           name: Codecov Coverage 
           command: | 
