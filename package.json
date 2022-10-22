@@ -14,8 +14,8 @@
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
-    "test:ci": "npm test -- --coverage",
-    "test:codecov": "npm run test:ci && codecov"
+    "test:local-ci": "npm test -- --coverage",
+    "test:remote-ci": "npm run test:local-ci && codecov && coveralls < coverage/lcov.info"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +31,8 @@
     "@types/supertest": "^2.0.12",
     "@types/validator": "^13.7.7",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
+    "coveralls": "^3.1.1",
+    "codecov": "^3.8.3",
     "eslint": "^8.24.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-import": "^2.26.0",
@@ -48,7 +50,6 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "codecov": "^3.8.3",
     "express": "^4.18.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.10.0",
