@@ -20,6 +20,6 @@ jobs:
             npm run test:codecov
       - coveralls/upload
 workflows:
-  test_my_api:
+  test_my_app:
     jobs:
       - coverage_test
