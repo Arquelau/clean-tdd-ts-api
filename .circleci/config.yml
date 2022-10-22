@@ -13,9 +13,9 @@ jobs:
           command: |
             npm install
       - run:
-          name: Codecov Coverage 
+          name: Remote Coverage 
           command: | 
-            npm run test:codecov
+            npm run test:remote-ci
 workflows:
   test_my_api:
     jobs:
