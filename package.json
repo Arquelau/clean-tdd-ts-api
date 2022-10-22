@@ -14,8 +14,8 @@
     "test:unit": "npm test -- --watch -c jest-unit-config.js",
     "test:integration": "npm test -- --watch -c jest-integration-config.js",
     "test:staged": "npm test -- --findRelatedTests",
-    "test:local-ci": "npm test -- --coverage",
-    "test:remote-ci": "npm run test:local-ci && codecov && coveralls < coverage/lcov.info"
+    "test:ci": "npm test -- --coverage",
+    "test:codecov": "npm run test:ci && codecov"
   },
   "keywords": [],
   "author": "",

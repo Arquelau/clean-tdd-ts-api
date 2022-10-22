@@ -3,4 +3,4 @@ node_js:
   - 16
 script:
   - eslint 'src/**'
-  - npm run test:remote-ci
+  - npm run test:codecov && coveralls < coverage/lcov.info
