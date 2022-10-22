@@ -1,6 +1,4 @@
 version: 2.1
-orbs:
-  coveralls: coveralls/coveralls@1.0.4
 jobs:
   coverage_test:
     docker: 
@@ -18,7 +16,6 @@ jobs:
           name: Remote Coverage 
           command: | 
             npm run test:codecov
-      - coveralls/upload
 workflows:
   test_my_app:
     jobs:
