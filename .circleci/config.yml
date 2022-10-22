@@ -1,0 +1,22 @@
+version: 2.1
+jobs:
+  coverage_test:
+    docker: 
+      - image: arkelaw/node:18
+        auth:
+            username: arkelaw
+            password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - checkout
+      - run:
+          name: Install npm dependencies
+          command: |
+            npm install
+      - run:
+          name: Codecov Coverage 
+          command: | 
+            npm run test:codecov
+workflows:
+  test_my_api:
+    jobs:
+      - coverage_test
