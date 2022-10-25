@@ -4,7 +4,7 @@ import { SurveyMongoRepository } from './survey-mongo-repository'
 
 let surveyCollection: Collection
 
-const makeSurveyInsertion = async (): Promise<void> => {
+const makeSurveyInsertionMany = async (): Promise<void> => {
   await surveyCollection.insertMany([{
     question: 'any_question',
     answers: [{
@@ -63,18 +63,37 @@ describe('Survey Mongo Repository', () => {
 
   describe('loadAll()', () => {
     test('Should load all surveys on success', async () => {
-      await makeSurveyInsertion()
+      await makeSurveyInsertionMany()
       const sut = makeSut()
       const surveys = await sut.loadAll()
       expect(surveys.length).toBe(2)
       expect(surveys[0].question).toBe('any_question')
       expect(surveys[1].question).toBe('another_question')
     })
+
+    test('Should load empty list', async () => {
+      const sut = makeSut()
+      const surveys = await sut.loadAll()
+      expect(surveys.length).toBe(0)
+    })
   })
 
-  test('Should load empty list', async () => {
-    const sut = makeSut()
-    const surveys = await sut.loadAll()
-    expect(surveys.length).toBe(0)
+  describe('loadById()', () => {
+    test('Should load survey by id on success', async () => {
+      const res = await surveyCollection.insertOne({
+        question: 'any_question',
+        answers: [{
+          image: 'any_image',
+          answer: 'any_answer'
+        }, {
+          answer: 'other_answer'
+        }],
+        date: new Date()
+      })
+      const id = res.insertedId.toString()
+      const sut = makeSut()
+      const survey = await sut.loadById(id)
+      expect(survey).toBeTruthy()
+    })
   })
 })
