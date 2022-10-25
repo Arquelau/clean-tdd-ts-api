@@ -13,10 +13,22 @@ LoadAccountByTokenRepository,
 UpdateAccessTokenRepository {
   async add (accountData: AddAccountModel): Promise<AccountModel> {
     const accountCollection = await MongoHelper.getCollection('accounts')
-    const result = await accountCollection.insertOne(accountData)
-    const accountID = result.insertedId
-    const account = await accountCollection.findOne(accountID)
-    return MongoHelper.map(account)
+    const account = await accountCollection.findOneAndUpdate(
+      {
+        email: accountData.email
+      },
+      {
+        $set: {
+          name: accountData.name,
+          password: accountData.password
+        }
+      },
+      {
+        upsert: true,
+        returnDocument: 'after'
+      }
+    )
+    return MongoHelper.map(account.value)
   }
 
   async loadByEmail (email: string): Promise<AccountModel> {
