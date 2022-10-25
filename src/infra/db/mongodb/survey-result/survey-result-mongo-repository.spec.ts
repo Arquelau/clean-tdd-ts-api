@@ -33,7 +33,7 @@ type Ids = {
   accountId: string
 }
 
-const makeFakeSurveyResultData = async (ids: Ids, answer: string): Promise<SaveSurveyResultParams> => {
+const mockSaveSurveyResultParams = async (ids: Ids, answer: string): Promise<SaveSurveyResultParams> => {
   return {
     surveyId: ids.surveyId,
     accountId: ids.accountId,
@@ -73,7 +73,7 @@ describe('Survey Mongo Repository', () => {
       const accountId = await makeInsertAccount()
 
       const sut = makeSut()
-      const surveyResultData = await makeFakeSurveyResultData({
+      const surveyResultData = await mockSaveSurveyResultParams({
         surveyId: surveyId.toString(),
         accountId: accountId.toString()
       }, 'any_answer')
@@ -96,7 +96,7 @@ describe('Survey Mongo Repository', () => {
       })
 
       const sut = makeSut()
-      const surveyResultData = await makeFakeSurveyResultData({
+      const surveyResultData = await mockSaveSurveyResultParams({
         surveyId: surveyId.toString(),
         accountId: accountId.toString()
       }, 'other_answer')
