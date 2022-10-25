@@ -48,7 +48,7 @@ const makeSurveyInsertion = async (): Promise<void> => {
   }])
 }
 
-describe('Login Routes', () => {
+describe('Survey Routes', () => {
   beforeAll(async () => {
     await MongoHelper.connect(env.mongoUrl)
   })
