@@ -1,7 +1,7 @@
 import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { SurveyResultMongoRepository } from './survey-result-mongo-repository'
-import { SaveSurveyResultModel } from '@/domain/usecases/survey-result/save-survey-result'
+import { SaveSurveyResultParams } from '@/domain/usecases/survey-result/save-survey-result'
 
 let accountCollection: Collection
 let surveyCollection: Collection
@@ -33,7 +33,7 @@ type Ids = {
   accountId: string
 }
 
-const makeFakeSurveyResultData = async (ids: Ids, answer: string): Promise<SaveSurveyResultModel> => {
+const makeFakeSurveyResultData = async (ids: Ids, answer: string): Promise<SaveSurveyResultParams> => {
   return {
     surveyId: ids.surveyId,
     accountId: ids.accountId,
