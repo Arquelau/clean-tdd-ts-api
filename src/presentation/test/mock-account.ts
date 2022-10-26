@@ -8,11 +8,11 @@ export const mockAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
     async add (account: AddAccountParams): Promise<AccountModel | null> {
       const fakeAccount = mockAccountModel()
-      return new Promise(resolve => resolve(fakeAccount))
+      return Promise.resolve(fakeAccount)
     }
 
     async exists (account: AddAccountParams): Promise<boolean> {
-      return new Promise(resolve => resolve(false))
+      return Promise.resolve(false)
     }
   }
   return new AddAccountStub()
@@ -21,7 +21,7 @@ export const mockAddAccount = (): AddAccount => {
 export const mockLoadAccountByToken = (): LoadAccountByToken => {
   class LoadAccountByTokenStub implements LoadAccountByToken {
     async load (accessToken: string): Promise<AccountModel> {
-      return new Promise(resolve => resolve(mockAccountModel()))
+      return Promise.resolve(mockAccountModel())
     }
   }
   return new LoadAccountByTokenStub()
@@ -30,7 +30,7 @@ export const mockLoadAccountByToken = (): LoadAccountByToken => {
 export const mockAuthentication = (): Authentication => {
   class AuthenticationStub implements Authentication {
     async auth (authentication: AuthenticationParams): Promise<string> {
-      return new Promise(resolve => resolve('any_token'))
+      return Promise.resolve('any_token')
     }
   }
   return new AuthenticationStub()

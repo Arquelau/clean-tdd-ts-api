@@ -40,7 +40,7 @@ describe('SingUp Controller', () => {
   test('Should return 500 if AddAccount add operation throws', async () => {
     const { sut, addAccountStub } = makeSut()
     jest.spyOn(addAccountStub, 'add').mockImplementationOnce(async () => {
-      return new Promise((resolve, reject) => reject(new ServerError('')))
+      return Promise.reject(new ServerError(''))
     })
     const httpRequest = mockRequest()
     const httpResponse = await sut.handle(httpRequest)
@@ -103,7 +103,7 @@ describe('SingUp Controller', () => {
 
   test('Should return 401 if Authentication returns null', async () => {
     const { sut, authenticationStub } = makeSut()
-    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+    jest.spyOn(authenticationStub, 'auth').mockReturnValueOnce(Promise.resolve(null))
     const httpRequest = mockRequest()
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(unauthorized())
@@ -111,7 +111,7 @@ describe('SingUp Controller', () => {
 
   test('Should return 403 if email is already in use', async () => {
     const { sut, addAccountStub } = makeSut()
-    jest.spyOn(addAccountStub, 'add').mockReturnValueOnce(new Promise(resolve => resolve(null)))
+    jest.spyOn(addAccountStub, 'add').mockReturnValueOnce(Promise.resolve(null))
     const httpRequest = mockRequest()
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
