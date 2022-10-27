@@ -22,10 +22,10 @@ export default {
   }, {
     name: 'Enquete'
   }],
-  paths: [{
+  paths: {
     '/login': loginPath,
     '/surveys': surveyPath
-  }],
+  },
   schemas: {
     account: accountSchema,
     loginParams: loginParamsSchema,

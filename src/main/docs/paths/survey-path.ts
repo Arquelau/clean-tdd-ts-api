@@ -2,15 +2,6 @@ export const surveyPath = {
   get: {
     tags: ['Enquete'],
     summary: 'API para listar todas as enquetes',
-    requestBody: {
-      content: {
-        'application/json': {
-          schema: {
-            $ref: '#/schemas/surveyParams'
-          }
-        }
-      }
-    },
     responses: {
       200: {
         description: 'Sucesso',
@@ -26,7 +17,7 @@ export const surveyPath = {
         $ref: '#/components/forbidden'
       },
       404: {
-        $ref: '#/components/not-found'
+        $ref: '#/components/notFound'
       },
       500: {
         $ref: '#/components/serverError'

@@ -1,5 +1,5 @@
 export const surveysSchema = {
-  type: 'object',
+  type: 'array',
   items: {
     $ref: '#/schemas/survey'
   }
