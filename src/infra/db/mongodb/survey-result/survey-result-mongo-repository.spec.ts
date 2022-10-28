@@ -22,6 +22,9 @@ const makeInsertSurvey = async (): Promise<any> => {
     answers: [{
       image: 'any_image',
       answer: 'any_answer'
+    }, {
+      image: 'other_image',
+      answer: 'other_answer'
     }],
     date: new Date()
   })
@@ -80,15 +83,20 @@ describe('Survey Mongo Repository', () => {
       const surveyResult = await sut.save(surveyResultData)
 
       expect(surveyResult).toBeTruthy()
-      expect(surveyResult.id).toBeTruthy()
-      expect(surveyResult.answer).toBe('any_answer')
+      expect(surveyResult.surveyId).toEqual(surveyId)
+      expect(surveyResult.question).toBeTruthy()
+      expect(surveyResult.answers[0].answer).toBe('any_answer')
+      expect(surveyResult.answers[0].count).toBe(1)
+      expect(surveyResult.answers[0].percent).toBe(100)
+      expect(surveyResult.answers[1].count).toBe(0)
+      expect(surveyResult.answers[1].percent).toBe(0)
     })
 
     test('Should update survey result if its not new', async () => {
       const surveyId = await makeInsertSurvey()
       const accountId = await makeInsertAccount()
 
-      const res = await surveyResultCollection.insertOne({
+      await surveyResultCollection.insertOne({
         surveyId,
         accountId,
         answer: 'any_answer',
@@ -103,8 +111,13 @@ describe('Survey Mongo Repository', () => {
       const surveyResult = await sut.save(surveyResultData)
 
       expect(surveyResult).toBeTruthy()
-      expect(surveyResult.id).toEqual(res.insertedId)
-      expect(surveyResult.answer).toBe('other_answer')
+      expect(surveyResult.surveyId).toEqual(surveyId)
+      expect(surveyResult.question).toBeTruthy()
+      expect(surveyResult.answers[0].answer).toBe('other_answer')
+      expect(surveyResult.answers[0].count).toBe(1)
+      expect(surveyResult.answers[0].percent).toBe(100)
+      expect(surveyResult.answers[1].count).toBe(0)
+      expect(surveyResult.answers[1].percent).toBe(0)
     })
   })
 })
