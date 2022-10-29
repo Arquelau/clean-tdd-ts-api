@@ -8,6 +8,7 @@ import {
   errorSchema,
   surveySchema,
   surveyAnswerSchema,
+  surveyResultAnswerSchema,
   surveysSchema
 } from './schemas/'
 
@@ -21,5 +22,6 @@ export default {
   error: errorSchema,
   survey: surveySchema,
   surveyAnswer: surveyAnswerSchema,
+  surveyResultAnswer: surveyResultAnswerSchema,
   surveys: surveysSchema
 }

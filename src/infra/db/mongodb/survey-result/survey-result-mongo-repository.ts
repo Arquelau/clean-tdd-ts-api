@@ -65,7 +65,7 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
             }
           },
           total: '$count',
-          answer: {
+          answers: {
             $filter: {
               input: '$survey.answers',
               as: 'item',
@@ -80,41 +80,31 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
         }
       })
       .unwind({
-        path: '$_id.answer'
+        path: '$_id.answers'
       })
       .addFields({
-        '_id.answer.count': '$count',
-        '_id.answer.percent': {
+        '_id.answers.count': '$count',
+        '_id.answers.percent': {
           $multiply: [{
             $divide: ['$count', '$_id.total']
           }, 100]
-        }
-      })
-      .group({
-        _id: {
-          surveyId: '$_id.surveyId',
-          question: '$_id.question',
-          date: '$_id.date',
-          allAnswersOptions: '$_id.allAnswersOptions'
-        },
-        answers: {
-          $push: '$_id.answer'
         }
       })
       .unwind({
         path: '$_id.allAnswersOptions',
         preserveNullAndEmptyArrays: true
       })
-      .addFields({
-        '_id.allAnswersOptions.count': {
-          $cond: [{
-            $eq: ['$_id.allAnswersOptions', null]
-          }, '$$REMOVE', 0]
+      .group({
+        _id: {
+          surveyId: '$_id.surveyId',
+          question: '$_id.question',
+          date: '$_id.date'
         },
-        '_id.allAnswersOptions.percent': {
-          $cond: [{
-            $eq: ['$_id.allAnswersOptions', null]
-          }, '$$REMOVE', 0]
+        allAnswersOptions: {
+          $addToSet: '$_id.allAnswersOptions'
+        },
+        answers: {
+          $addToSet: '$_id.answers'
         }
       })
       .group({
@@ -122,22 +112,53 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
           surveyId: '$_id.surveyId',
           question: '$_id.question',
           date: '$_id.date',
-          answers: '$answers'
+          answers: '$answers',
+          diffAnswersOptions: {
+            $map: {
+              input: { $setDifference: ['$allAnswersOptions.answer', '$answers.answer'] },
+              as: 'e',
+              in: { answer: '$$e' }
+            }
+          }
+        }
+      })
+      .addFields({
+        '_id.diffAnswersOptions.count': {
+          $cond: [{
+            $eq: ['$_id.diffAnswersOptions', null]
+          }, '$$REMOVE', 0]
         },
-        allAnswersOptions: {
-          $push: '$_id.allAnswersOptions'
+        '_id.diffAnswersOptions.percent': {
+          $cond: [{
+            $eq: ['$_id.diffAnswersOptions', null]
+          }, '$$REMOVE', 0]
+        }
+      })
+      .unwind({
+        path: '$_id.diffAnswersOptions',
+        preserveNullAndEmptyArrays: true
+      })
+      .group({
+        _id: {
+          surveyId: '$_id.surveyId',
+          question: '$_id.question',
+          date: '$_id.date',
+          answers: '$_id.answers'
+        },
+        diffAnswersOptions: {
+          $addToSet: '$_id.diffAnswersOptions'
         }
       })
       .group({
         _id: {
           surveyId: '$_id.surveyId',
           question: '$_id.question',
+          date: '$_id.date',
           answers: {
             $cond: [{
-              $eq: ['$allAnswersOptions', null]
-            }, '$_id.answers', { $concatArrays: ['$_id.answers', '$allAnswersOptions'] }]
-          },
-          date: '$_id.date'
+              $eq: ['$_id.diffAnswersOptions', null]
+            }, '$_id.answers', { $concatArrays: ['$_id.answers', '$diffAnswersOptions'] }]
+          }
         }
       })
       .project({
