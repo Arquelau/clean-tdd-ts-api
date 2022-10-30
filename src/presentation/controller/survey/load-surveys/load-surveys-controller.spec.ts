@@ -1,5 +1,5 @@
 import { noContent, ok, serverError } from '@/presentation/helper/http/http-helper'
-import { mockSurveyModelArray } from '@/domain/test'
+import { mockSurveyModelArray, throwError } from '@/domain/test'
 import { mockLoadSurveys } from '@/presentation/test'
 import { LoadSurveysController } from './load-surveys-controller'
 import { LoadSurveys } from './load-surveys-controller-protocols'
@@ -50,7 +50,7 @@ describe('LoadSurveys Controller', () => {
 
   test('Shoul return 500 if LoadSurveys throws', async () => {
     const { sut, loadSurveysStub } = makeSut()
-    jest.spyOn(loadSurveysStub, 'load').mockImplementationOnce(() => { throw new Error() })
+    jest.spyOn(loadSurveysStub, 'load').mockImplementationOnce(() => { return throwError() })
     const httpResponse = await sut.handle({})
     expect(httpResponse).toEqual(serverError(new Error()))
   })

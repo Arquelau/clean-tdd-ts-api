@@ -3,6 +3,7 @@ import { SaveSurveyResultRepository } from '@/data/protocols/db/survey-result/sa
 import { SurveyResultModel } from '@/domain/models/survey-result'
 import { SaveSurveyResultParams } from '@/domain/usecases/survey-result/save-survey-result'
 import { MongoHelper, QueryBuilder } from '@/infra/db/mongodb/helpers'
+import round from 'mongo-round'
 
 export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
   async save (data: SaveSurveyResultParams): Promise<SurveyResultModel> {
@@ -18,23 +19,24 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
     }, {
       upsert: true
     })
-    const surveyResult = this.loadBySurveyId(data.surveyId)
+    const surveyResult = this.loadBySurveyId(data.surveyId, data.accountId)
     return surveyResult
   }
 
-  private async loadBySurveyId (id: string): Promise<SurveyResultModel> {
+  private async loadBySurveyId (surveyId: string, accountId: string): Promise<SurveyResultModel> {
     const surveyResultCollection = await MongoHelper.getCollection('surveyResults')
-    const surveyId = MongoHelper.stringToObjectId(id)
+    const surveyObjId = MongoHelper.stringToObjectId(surveyId)
+    const accountObjId = MongoHelper.stringToObjectId(accountId)
     const query = new QueryBuilder()
       .match({
-        surveyId
+        surveyId: surveyObjId
       })
       .group({
         _id: 0,
         data: {
           $push: '$$ROOT'
         },
-        count: {
+        total: {
           $sum: 1
         }
       })
@@ -55,109 +57,16 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
           surveyId: '$survey._id',
           question: '$survey.question',
           date: '$survey.date',
-          allAnswersOptions: {
-            $filter: {
-              input: '$survey.answers',
-              as: 'item',
-              cond: {
-                $ne: ['$$item.answer', '$data.answer']
-              }
-            }
-          },
-          total: '$count',
-          answers: {
-            $filter: {
-              input: '$survey.answers',
-              as: 'item',
-              cond: {
-                $eq: ['$$item.answer', '$data.answer']
-              }
-            }
-          }
+          total: '$total',
+          answer: '$data.answer',
+          answers: '$survey.answers'
         },
         count: {
           $sum: 1
-        }
-      })
-      .unwind({
-        path: '$_id.answers'
-      })
-      .addFields({
-        '_id.answers.count': '$count',
-        '_id.answers.percent': {
-          $multiply: [{
-            $divide: ['$count', '$_id.total']
-          }, 100]
-        }
-      })
-      .unwind({
-        path: '$_id.allAnswersOptions',
-        preserveNullAndEmptyArrays: true
-      })
-      .group({
-        _id: {
-          surveyId: '$_id.surveyId',
-          question: '$_id.question',
-          date: '$_id.date'
         },
-        allAnswersOptions: {
-          $addToSet: '$_id.allAnswersOptions'
-        },
-        answers: {
-          $addToSet: '$_id.answers'
-        }
-      })
-      .group({
-        _id: {
-          surveyId: '$_id.surveyId',
-          question: '$_id.question',
-          date: '$_id.date',
-          answers: '$answers',
-          diffAnswersOptions: {
-            $map: {
-              input: { $setDifference: ['$allAnswersOptions.answer', '$answers.answer'] },
-              as: 'e',
-              in: { answer: '$$e' }
-            }
-          }
-        }
-      })
-      .addFields({
-        '_id.diffAnswersOptions.count': {
-          $cond: [{
-            $eq: ['$_id.diffAnswersOptions', null]
-          }, '$$REMOVE', 0]
-        },
-        '_id.diffAnswersOptions.percent': {
-          $cond: [{
-            $eq: ['$_id.diffAnswersOptions', null]
-          }, '$$REMOVE', 0]
-        }
-      })
-      .unwind({
-        path: '$_id.diffAnswersOptions',
-        preserveNullAndEmptyArrays: true
-      })
-      .group({
-        _id: {
-          surveyId: '$_id.surveyId',
-          question: '$_id.question',
-          date: '$_id.date',
-          answers: '$_id.answers'
-        },
-        diffAnswersOptions: {
-          $addToSet: '$_id.diffAnswersOptions'
-        }
-      })
-      .group({
-        _id: {
-          surveyId: '$_id.surveyId',
-          question: '$_id.question',
-          date: '$_id.date',
-          answers: {
-            $cond: [{
-              $eq: ['$_id.diffAnswersOptions', null]
-            }, '$_id.answers', { $concatArrays: ['$_id.answers', '$diffAnswersOptions'] }]
+        currentAccountAnswer: {
+          $push: {
+            $cond: [{ $eq: ['$data.accountId', accountObjId] }, '$data.answer', '$invalid']
           }
         }
       })
@@ -165,8 +74,129 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository {
         _id: 0,
         surveyId: '$_id.surveyId',
         question: '$_id.question',
-        answers: '$_id.answers',
-        date: '$_id.date'
+        date: '$_id.date',
+        answers: {
+          $map: {
+            input: '$_id.answers',
+            as: 'item',
+            in: {
+              $mergeObjects: ['$$item', {
+                count: {
+                  $cond: {
+                    if: {
+                      $eq: ['$$item.answer', '$_id.answer']
+                    },
+                    then: '$count',
+                    else: 0
+                  }
+                },
+                percent: {
+                  $cond: {
+                    if: {
+                      $eq: ['$$item.answer', '$_id.answer']
+                    },
+                    then: {
+                      $multiply: [{
+                        $divide: ['$count', '$_id.total']
+                      }, 100]
+                    },
+                    else: 0
+                  }
+                },
+                isCurrentAccountAnswerCount: {
+                  $cond: [{
+                    $eq: ['$$item.answer', {
+                      $arrayElemAt: ['$currentAccountAnswer', 0]
+                    }]
+                  }, 1, 0]
+                }
+              }]
+            }
+          }
+        }
+      })
+      .group({
+        _id: {
+          surveyId: '$surveyId',
+          question: '$question',
+          date: '$date'
+        },
+        answers: {
+          $push: '$answers'
+        }
+      })
+      .project({
+        _id: 0,
+        surveyId: '$_id.surveyId',
+        question: '$_id.question',
+        date: '$_id.date',
+        answers: {
+          $reduce: {
+            input: '$answers',
+            initialValue: [],
+            in: {
+              $concatArrays: ['$$value', '$$this']
+            }
+          }
+        }
+      })
+      .unwind({
+        path: '$answers'
+      })
+      .group({
+        _id: {
+          surveyId: '$surveyId',
+          question: '$question',
+          date: '$date',
+          answer: '$answers.answer',
+          image: '$answers.image'
+        },
+        count: {
+          $sum: '$answers.count'
+        },
+        percent: {
+          $sum: '$answers.percent'
+        },
+        isCurrentAccountAnswerCount: {
+          $sum: '$answers.isCurrentAccountAnswerCount'
+        }
+      })
+      .project({
+        _id: 0,
+        surveyId: '$_id.surveyId',
+        question: '$_id.question',
+        date: '$_id.date',
+        answer: {
+          answer: '$_id.answer',
+          image: '$_id.image',
+          count: round('$count'),
+          percent: round('$percent'),
+          isCurrentAccountAnswer: {
+            $eq: ['$isCurrentAccountAnswerCount', 1]
+          }
+        }
+      })
+      .sort({
+        'answer.count': -1
+      })
+      .group({
+        _id: {
+          surveyId: '$surveyId',
+          question: '$question',
+          date: '$date'
+        },
+        answers: {
+          $push: '$answer'
+        }
+      })
+      .project({
+        _id: 0,
+        surveyId: {
+          $toString: '$_id.surveyId'
+        },
+        question: '$_id.question',
+        date: '$_id.date',
+        answers: '$answers'
       })
       .build()
 

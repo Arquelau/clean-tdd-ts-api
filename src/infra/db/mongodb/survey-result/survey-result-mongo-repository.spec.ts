@@ -83,7 +83,7 @@ describe('Survey Mongo Repository', () => {
       const surveyResult = await sut.save(surveyResultData)
 
       expect(surveyResult).toBeTruthy()
-      expect(surveyResult.surveyId).toEqual(surveyId)
+      expect(surveyResult.surveyId).toEqual(surveyId.toString())
       expect(surveyResult.question).toBeTruthy()
       expect(surveyResult.answers[0].answer).toBe('any_answer')
       expect(surveyResult.answers[0].count).toBe(1)
@@ -111,7 +111,7 @@ describe('Survey Mongo Repository', () => {
       const surveyResult = await sut.save(surveyResultData)
 
       expect(surveyResult).toBeTruthy()
-      expect(surveyResult.surveyId).toEqual(surveyId)
+      expect(surveyResult.surveyId).toEqual(surveyId.toString())
       expect(surveyResult.question).toBeTruthy()
       expect(surveyResult.answers[0].answer).toBe('other_answer')
       expect(surveyResult.answers[0].count).toBe(1)
