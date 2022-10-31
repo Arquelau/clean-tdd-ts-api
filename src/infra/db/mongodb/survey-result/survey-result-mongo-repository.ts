@@ -200,7 +200,7 @@ export class SurveyResultMongoRepository implements SaveSurveyResultRepository, 
       .build()
 
     const result = (await surveyResultCollection.aggregate(query).toArray())
-    if (result) {
+    if (result.length !== 0) {
       const surveyResult = result[0] as SurveyResultModel
       return surveyResult
     }

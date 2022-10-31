@@ -121,7 +121,7 @@ describe('Survey Mongo Repository', () => {
   })
 
   describe('loadBySurveyId()', () => {
-    test('Should return a SurveyResultModel', async () => {
+    test('Should return a SurveyResultModel if user answer the survey', async () => {
       const surveyId = await makeInsertSurvey()
       const accountId = await makeInsertAccount()
 
@@ -159,6 +159,16 @@ describe('Survey Mongo Repository', () => {
       expect(surveyResult.answers[1].percent).toBe(50)
       expect(surveyResult.answers[2].count).toBe(0)
       expect(surveyResult.answers[2].percent).toBe(0)
+    })
+
+    test('Should return null if there is no user answer', async () => {
+      const surveyId = await makeInsertSurvey()
+      const accountId = await makeInsertAccount()
+
+      const sut = makeSut()
+      const surveyResult = await sut.loadBySurveyId(surveyId.toString(), accountId.toString())
+
+      expect(surveyResult).toBeNull()
     })
   })
 })
