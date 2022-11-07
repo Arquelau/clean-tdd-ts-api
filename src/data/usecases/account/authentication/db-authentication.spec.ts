@@ -88,10 +88,11 @@ describe('DbAuthentication Usecase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  test('Should return a token if DbAuthentication is working properly', async () => {
+  test('Should return a AuthenticationModel if DbAuthentication is working properly', async () => {
     const { sut } = makeSut()
-    const accessToken = await sut.auth(mockAuthenticationParams())
-    expect(accessToken).toBe('any_token')
+    const authenticationModel = await sut.auth(mockAuthenticationParams())
+    expect(authenticationModel.accessToken).toBe('any_token')
+    expect(authenticationModel.name).toBe('any_name')
   })
 
   test('Should call UpdateAccessTokenRepository with correct values', async () => {
