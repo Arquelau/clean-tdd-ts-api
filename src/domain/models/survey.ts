@@ -3,6 +3,7 @@ export type SurveyModel = {
   question: string
   answers: SurveyAnswersModel[]
   date: Date
+  didAnswer?: boolean
 }
 
 type SurveyAnswersModel = {

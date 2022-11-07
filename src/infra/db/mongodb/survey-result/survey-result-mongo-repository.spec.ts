@@ -2,6 +2,7 @@ import { Collection } from 'mongodb'
 import { MongoHelper } from '@/infra/db/mongodb/helpers/mongo-helper'
 import { SurveyResultMongoRepository } from './survey-result-mongo-repository'
 import { SaveSurveyResultParams } from '@/domain/usecases/survey-result/save-survey-result'
+import MockDate from 'mockdate'
 
 let accountCollection: Collection
 let surveyCollection: Collection
@@ -52,10 +53,12 @@ describe('Survey Mongo Repository', () => {
   beforeAll(async () => {
     const mongoUrl = process.env.MONGO_URL || ''
     await MongoHelper.connect(mongoUrl)
+    MockDate.set(new Date())
   })
 
   afterAll(async () => {
     await MongoHelper.disconnect()
+    MockDate.reset()
   })
 
   beforeEach(async () => {
